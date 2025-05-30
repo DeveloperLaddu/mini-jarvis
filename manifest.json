@@ -1,7 +1,7 @@
 {
   "name": "mini-jarvis",
   "short_name": "App",
-  "start_url": "/",
+  "start_url": "/mini-jarvis",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
