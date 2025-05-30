@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#333333" />
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <title>Jarvis Voice Assistant</title>
+</head>
+
+<body>
+    <h2>Hi, I'm Jarvis! 🤖</h2>
+    <button onclick="startListening()">🎤 Speak to Jarvis</button>
+    <p id="output">You said: ...</p>
+
+    <script>
+        const jokes = [
+            "Why don't scientists trust atoms? Because they make up everything.",
+            "Why did the scarecrow win an award? Because he was outstanding in his field.",
+            "What do you call fake spaghetti? An impasta!",
+            "Why can't your nose be 12 inches long? Because then it would be a foot.",
+            "Why did the math book look sad? Because it had too many problems."
+        ];
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            speechSynthesis.speak(utterance);
+        }
+
+        function startListening() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.start(); console.log("Listening...");
+
+            recognition.onresult = function (event) {
+                console.log("Speech recognized:", event);
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                document.getElementById("output").innerText = "You said: " + transcript;
+
+                if (transcript.includes("hello")) {
+                    speak("Hello! How can I help you?");
+                } else if (transcript.includes("your name")) {
+                    speak("I am Jarvis, your voice assistant.");
+                } else if (transcript.includes("how are you")) {
+                    speak("I'm doing great, thank you for asking!");
+                } else if (transcript.includes("what time is it")) {
+                    const now = new Date();
+                    speak("The current time is " + now.getHours() + ":" + now.getMinutes());
+                } else if (transcript.includes("what day is it")) {
+                    const day = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+                    speak("Today is " + day);
+                } else if (transcript.includes("what date is it")) {
+                    const date = new Date().toLocaleDateString();
+                    speak("Today's date is " + date);
+                } else if (transcript.includes("tell me a joke")) {
+                    const joke = jokes[Math.floor(Math.random() * jokes.length)];
+                    speak(joke);
+                } else if (transcript.includes("open youtube")) {
+                    speak("Opening YouTube.");
+                    window.open("https://www.youtube.com", "_blank");
+                } else if (transcript.includes("open google")) {
+                    speak("Opening Google.");
+                    window.open("https://www.google.com", "_blank");
+                } else if (transcript.includes("play music")) {
+                    speak("Playing music for you.");
+                    window.open("https://www.jiosaavn.com", "_blank");
+                } else if (transcript.includes("search for")) {
+                    const query = transcript.split("search for")[1].trim();
+                    speak("Searching Google for " + query);
+                    window.open("https://www.google.com/search?q=" + encodeURIComponent(query), "_blank");
+                } else if (transcript.includes("what is")) {
+                    try {
+                        const expression = transcript.replace("what is", "").trim();
+                        const result = eval(expression);
+                        speak("The answer is " + result);
+                    } catch (error) {
+                        speak("Sorry, I couldn't calculate that.");
+                    }
+                } else {
+                    speak("Sorry, I didn't understand that.");
+                }
+            };
+
+            recognition.onerror = function (event) {
+                console.error("Speech recognition error:", event);
+                speak("Sorry, I couldn't hear you. Please try again.");
+            };
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered!', reg))
+                .catch(err => console.error('Service Worker registration failed:', err));
+        }
+    </script>
+
+</body>
+
+</html>
